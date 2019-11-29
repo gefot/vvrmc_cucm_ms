@@ -7,6 +7,7 @@ from modules import module_cdr_funcs
 from modules import module_general_funcs
 from modules import cdr_classes
 
+# This is needed so as to run on CLI
 sys.path.append('/home/gfot/vvrmc_cucm_ms')
 
 ACCESS = json.load(open('/home/gfot/vvrmc_cucm_ms/data/security/access.json'))

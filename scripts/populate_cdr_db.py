@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append('/home/gfot/cucm-cdr-analyzer')
+sys.path.append('/home/gfot/vvrmc_cucm_ms')
 
 from modules import module_funcs
 

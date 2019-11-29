@@ -3,20 +3,21 @@ import datetime
 import json
 import sys
 
-sys.path.append('/home/gfot/cucm-cdr-analyzer')
+sys.path.append('/home/gfot/vvrmc_cucm_ms')
 
 from modules import module_funcs
 from modules import classes
 
 
-access = json.load(open('/home/gfot/cucm-cdr-analyzer/data/security/access.json'))
+access = json.load(open('/home/gfot/vvrmc_cucm_ms/data/security/access.json'))
+OUTPUT_PATH = '/home/gfot/vvrmc_cucm_ms/data/output/'
+
 if len(sys.argv) == 2:
     REPORT_TYPE = sys.argv[1]
 else:
     REPORT_TYPE = "monthly"
 SEND_EMAILS = False
 
-OUTPUT_PATH = '/home/gfot/cucm-cdr-analyzer/data/output/'
 DEPARTMENTS = {'Main_Hospital': '1001', '1801_Clinic': '5810', 'Specialty_Clinic': '5850'}
 EXTENSIONS = {'Orthopediatric_Clinic': '7002', 'Urology_Clinic': '1733'}
 HUNTPILOTS = {'IT_Helpdesk': '3333'}

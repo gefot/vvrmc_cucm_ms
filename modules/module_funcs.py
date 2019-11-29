@@ -14,7 +14,7 @@ import ftplib
 
 CDR_REPO = '/home/gfot/cdr/cdr_repo/'
 CDR_ARCHIVE = '/home/gfot/cdr/cdr_archive/'
-CDR_DB = "/home/gfot/cucm-cdr-analyzer/cucm.db"
+CDR_DB = "/home/gfot/vvrmc_cucm_ms/cucm.db"
 VM_PILOT = "5500"
 
 

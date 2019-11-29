@@ -1,16 +1,15 @@
 import os
 import datetime
-import time
 import sqlite3
 
-import csv
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-import ftplib
+
+from modules import module_general_funcs
 
 CDR_REPO = '/home/gfot/cdr/cdr_repo/'
 CDR_ARCHIVE = '/home/gfot/cdr/cdr_archive/'
@@ -112,72 +111,6 @@ def populate_db():
 
 
 ###########################################################################################################################################
-def timestamp_to_date(my_timestamp):
-    return datetime.datetime.fromtimestamp(my_timestamp)
-
-
-###########################################################################################################################################
-def date_to_timestamp(my_date):
-    return time.mktime(datetime.datetime.strptime(my_date, "%Y%m%d%H%M%S").timetuple())
-
-
-###########################################################################################################################################
-def weekday_from_timestamp(my_timestamp):
-    return datetime.datetime.fromtimestamp(my_timestamp).strftime('%a')
-
-
-###########################################################################################################################################
-def hour_from_timestamp(my_timestamp):
-    return datetime.datetime.fromtimestamp(my_timestamp).strftime('%H')
-
-
-###########################################################################################################################################
-def day_timestamp_range_from_date(my_date):
-    dt = datetime.datetime.strptime(my_date, '%Y%m%d%H%M%S')
-
-    my_start = dt.replace(hour=0, minute=0, second=1).strftime('%Y%m%d%H%M%S')
-    my_end = dt.replace(hour=23, minute=59, second=59).strftime('%Y%m%d%H%M%S')
-    print("inside day_timestamp_range_from_date: ", my_start, my_end)
-    day_range = [date_to_timestamp(my_start), date_to_timestamp(my_end)]
-
-    return day_range
-
-
-###########################################################################################################################################
-def week_timestamp_range_from_date(my_date):
-    dt = datetime.datetime.strptime(my_date, '%Y%m%d%H%M%S')
-
-    start = dt - datetime.timedelta(days=dt.weekday())
-    end = start + datetime.timedelta(days=6)
-
-    my_start = start.replace(hour=0, minute=0, second=1).strftime('%Y%m%d%H%M%S')
-    my_end = end.replace(hour=23, minute=59, second=59).strftime('%Y%m%d%H%M%S')
-    print("inside week_timestamp_range_from_date: ", my_start, my_end)
-    week_range = [date_to_timestamp(my_start), date_to_timestamp(my_end)]
-
-    return week_range
-
-
-###########################################################################################################################################
-def last_day_of_month(any_day):
-    next_month = any_day.replace(day=28) + datetime.timedelta(days=4)  # this will never fail
-    return next_month - datetime.timedelta(days=next_month.day)
-
-
-###########################################################################################################################################
-def month_timestamp_range_from_date(my_date):
-    dt = datetime.datetime.strptime(my_date, '%Y%m%d%H%M%S')
-
-    last_day = last_day_of_month(dt)
-    my_start = dt.replace(day=1, hour=0, minute=0, second=1).strftime('%Y%m%d%H%M%S')
-    my_end = dt.replace(day=int(last_day.strftime('%d')), hour=23, minute=59, second=59).strftime('%Y%m%d%H%M%S')
-    print("inside week_timestamp_range_from_date: ", my_start, my_end)
-    month_range = [date_to_timestamp(my_start), date_to_timestamp(my_end)]
-
-    return month_range
-
-
-###########################################################################################################################################
 def get_cdr(start_timestamp, end_timestamp, callingNumber, calledNumber):
     conn = sqlite3.connect(CDR_DB)
     my_cursor = conn.cursor()
@@ -220,52 +153,52 @@ def get_cdr_record_by_callID(callID):
 def get_cdr_by_schedule(ts, extension):
     # Main Hospital Extension -> AA
     if extension == "1001":
-        if weekday_from_timestamp(ts) == "Mon" or weekday_from_timestamp(ts) == "Tue" or weekday_from_timestamp(ts) == "Wed" or weekday_from_timestamp(
-                ts) == "Thu" or weekday_from_timestamp(ts) == "Fri":
-            if int(hour_from_timestamp(ts)) >= 6 and int(hour_from_timestamp(ts)) < 22:
+        if module_general_funcs.weekday_from_timestamp(ts) == "Mon" or module_general_funcs.weekday_from_timestamp(ts) == "Tue" or module_general_funcs.weekday_from_timestamp(ts) == "Wed" or module_general_funcs.weekday_from_timestamp(
+                ts) == "Thu" or module_general_funcs.weekday_from_timestamp(ts) == "Fri":
+            if int(module_general_funcs.hour_from_timestamp(ts)) >= 6 and int(module_general_funcs.hour_from_timestamp(ts)) < 22:
                 return True
 
     # 1801 Clinic Hunt Pilot -> AA
     if extension == "5810":
-        if weekday_from_timestamp(ts) == "Mon" or weekday_from_timestamp(ts) == "Tue" or weekday_from_timestamp(ts) == "Wed" or weekday_from_timestamp(ts) == "Thu":
-            if int(hour_from_timestamp(ts)) >= 8 and int(hour_from_timestamp(ts)) < 17:
+        if module_general_funcs.weekday_from_timestamp(ts) == "Mon" or module_general_funcs.weekday_from_timestamp(ts) == "Tue" or module_general_funcs.weekday_from_timestamp(ts) == "Wed" or module_general_funcs.weekday_from_timestamp(ts) == "Thu":
+            if int(module_general_funcs.hour_from_timestamp(ts)) >= 8 and int(module_general_funcs.hour_from_timestamp(ts)) < 17:
                 return True
-        elif weekday_from_timestamp(ts) == "Fri":
-            if (int(hour_from_timestamp(ts)) >= 8 and int(hour_from_timestamp(ts)) < 12) or (int(hour_from_timestamp(ts)) >= 13 and int(hour_from_timestamp(ts)) < 16):
+        elif module_general_funcs.weekday_from_timestamp(ts) == "Fri":
+            if (int(module_general_funcs.hour_from_timestamp(ts)) >= 8 and int(module_general_funcs.hour_from_timestamp(ts)) < 12) or (int(module_general_funcs.hour_from_timestamp(ts)) >= 13 and int(module_general_funcs.hour_from_timestamp(ts)) < 16):
                 return True
 
     # 1200 Clinic Hunt Pilot -> AA
     if extension == "5850":
-        if weekday_from_timestamp(ts) == "Mon" or weekday_from_timestamp(ts) == "Tue" or weekday_from_timestamp(ts) == "Wed" or weekday_from_timestamp(ts) == "Thu":
-            if (int(hour_from_timestamp(ts)) >= 8 and int(hour_from_timestamp(ts)) < 12) or (int(hour_from_timestamp(ts)) >= 13 and int(hour_from_timestamp(ts)) < 17):
+        if module_general_funcs.weekday_from_timestamp(ts) == "Mon" or module_general_funcs.weekday_from_timestamp(ts) == "Tue" or module_general_funcs.weekday_from_timestamp(ts) == "Wed" or module_general_funcs.weekday_from_timestamp(ts) == "Thu":
+            if (int(module_general_funcs.hour_from_timestamp(ts)) >= 8 and int(module_general_funcs.hour_from_timestamp(ts)) < 12) or (int(module_general_funcs.hour_from_timestamp(ts)) >= 13 and int(module_general_funcs.hour_from_timestamp(ts)) < 17):
                 return True
-        elif weekday_from_timestamp(ts) == "Fri":
-            if (int(hour_from_timestamp(ts)) >= 8 and int(hour_from_timestamp(ts)) < 12):
+        elif module_general_funcs.weekday_from_timestamp(ts) == "Fri":
+            if (int(module_general_funcs.hour_from_timestamp(ts)) >= 8 and int(module_general_funcs.hour_from_timestamp(ts)) < 12):
                 return True
 
     # Orthopedic Clinic Extension
     if extension == "7002":
-        if weekday_from_timestamp(ts) == "Mon" or weekday_from_timestamp(ts) == "Tue" or weekday_from_timestamp(ts) == "Wed" or weekday_from_timestamp(ts) == "Thu":
-            if (int(hour_from_timestamp(ts)) >= 8 and int(hour_from_timestamp(ts)) < 17):
+        if module_general_funcs.weekday_from_timestamp(ts) == "Mon" or module_general_funcs.weekday_from_timestamp(ts) == "Tue" or module_general_funcs.weekday_from_timestamp(ts) == "Wed" or module_general_funcs.weekday_from_timestamp(ts) == "Thu":
+            if (int(module_general_funcs.hour_from_timestamp(ts)) >= 8 and int(module_general_funcs.hour_from_timestamp(ts)) < 17):
                 return True
-        elif weekday_from_timestamp(ts) == "Fri":
-            if (int(hour_from_timestamp(ts)) >= 8 and int(hour_from_timestamp(ts)) < 12):
+        elif module_general_funcs.weekday_from_timestamp(ts) == "Fri":
+            if (int(module_general_funcs.hour_from_timestamp(ts)) >= 8 and int(module_general_funcs.hour_from_timestamp(ts)) < 12):
                 return True
 
     # Urology Clinic Extension
     if extension == "1733":
-        if weekday_from_timestamp(ts) == "Mon" or weekday_from_timestamp(ts) == "Tue" or weekday_from_timestamp(ts) == "Wed" or weekday_from_timestamp(ts) == "Thu":
-            if (int(hour_from_timestamp(ts)) >= 8 and int(hour_from_timestamp(ts)) < 12) or (int(hour_from_timestamp(ts)) >= 13 and int(hour_from_timestamp(ts)) < 17):
+        if module_general_funcs.weekday_from_timestamp(ts) == "Mon" or module_general_funcs.weekday_from_timestamp(ts) == "Tue" or module_general_funcs.weekday_from_timestamp(ts) == "Wed" or module_general_funcs.weekday_from_timestamp(ts) == "Thu":
+            if (int(module_general_funcs.hour_from_timestamp(ts)) >= 8 and int(module_general_funcs.hour_from_timestamp(ts)) < 12) or (int(module_general_funcs.hour_from_timestamp(ts)) >= 13 and int(module_general_funcs.hour_from_timestamp(ts)) < 17):
                 return True
-        elif weekday_from_timestamp(ts) == "Fri":
-            if (int(hour_from_timestamp(ts)) >= 8 and int(hour_from_timestamp(ts)) < 12):
+        elif module_general_funcs.weekday_from_timestamp(ts) == "Fri":
+            if (int(module_general_funcs.hour_from_timestamp(ts)) >= 8 and int(module_general_funcs.hour_from_timestamp(ts)) < 12):
                 return True
 
     # IT Helpdesk Hunt Pilot
     if extension == "3333":
-        if weekday_from_timestamp(ts) == "Mon" or weekday_from_timestamp(ts) == "Tue" or weekday_from_timestamp(ts) == "Wed" or weekday_from_timestamp(
-                ts) == "Thu" or weekday_from_timestamp(ts) == "Fri":
-            if (int(hour_from_timestamp(ts)) >= 9 and int(hour_from_timestamp(ts)) < 17):
+        if module_general_funcs.weekday_from_timestamp(ts) == "Mon" or module_general_funcs.weekday_from_timestamp(ts) == "Tue" or module_general_funcs.weekday_from_timestamp(ts) == "Wed" or module_general_funcs.weekday_from_timestamp(
+                ts) == "Thu" or module_general_funcs.weekday_from_timestamp(ts) == "Fri":
+            if (int(module_general_funcs.hour_from_timestamp(ts)) >= 9 and int(module_general_funcs.hour_from_timestamp(ts)) < 17):
                 return True
 
     return False

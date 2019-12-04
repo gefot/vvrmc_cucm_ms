@@ -19,8 +19,8 @@ start_date = (datetime.datetime.today() - datetime.timedelta(minutes=5)).strftim
 start_timestamp = module_general_funcs.date_to_timestamp(start_date)
 end_timestamp = module_general_funcs.date_to_timestamp(end_date)
 
-print(start_date)
-print(end_date)
+# print(start_date)
+# print(end_date)
 print(start_timestamp)
 print(end_timestamp)
 

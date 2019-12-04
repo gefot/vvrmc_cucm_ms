@@ -1,14 +1,14 @@
+import sys
+# This is needed so as to run on CLI
+sys.path.append('/home/gfot/vvrmc_cucm_ms')
 
 import datetime
 import json
-import sys
 
 from modules import module_cdr_funcs
 from modules import module_general_funcs
 from modules import cdr_classes
 
-# This is needed so as to run on CLI
-sys.path.append('/home/gfot/vvrmc_cucm_ms')
 
 ACCESS = json.load(open('/home/gfot/vvrmc_cucm_ms/data/security/access.json'))
 OUTPUT_PATH = '/home/gfot/vvrmc_cucm_ms/data/output/'
@@ -18,7 +18,7 @@ if len(sys.argv) == 2:
     REPORT_TYPE = sys.argv[1]
 else:
     REPORT_TYPE = "monthly"
-SEND_EMAILS = False
+SEND_EMAILS = True
 
 DEPARTMENTS = {'Main_Hospital': '1001', '1801_Clinic': '5810', 'Specialty_Clinic': '5850'}
 EXTENSIONS = {'Orthopediatric_Clinic': '7002', 'Urology_Clinic': '1733'}
@@ -78,6 +78,19 @@ for department, extension in DEPARTMENTS.items():
     print(callTreeStats.html_content)
     print(callTreeStats)
 
+    if SEND_EMAILS:
+        USERNAME = str(ACCESS["o365"]["username"])
+        PASSWORD = str(ACCESS["o365"]["password"])
+        MAIL_SERVER = str(ACCESS["o365"]["mail_server"])
+        # toaddr = ["abhijit.dhar@whitehatvirtual.com", "val.king@whitehatvirtual.com", \
+        #           "dgalma01@vvrmc.org", "maricela.sandoval@amistadmp.org", "melanie.torres@vvrmc.org", \
+        #           "Albert.Lattimer@vvrmc.org", "letty.ortiz@vvrmc.org",
+        #           "georgios.fotiadis@whitehatvirtual.com"]
+        # toaddr = ["georgios.fotiadis@whitehatvirtual.com", "Maricela.Sandoval@vvrmc.org"]
+        toaddr = ["georgios.fotiadis@whitehatvirtual.com"]
+        module_general_funcs.send_mail(USERNAME, PASSWORD, MAIL_SERVER, toaddr, callTreeStats.email_subject,
+                                       callTreeStats.html_content, [callTreeStats.full_filename], False, False)
+
 ################
 ## EXTENSIONS ##
 ################
@@ -109,6 +122,18 @@ for department, extension in EXTENSIONS.items():
     print(extensionStats.html_content)
     print(extensionStats)
 
+    if SEND_EMAILS:
+        USERNAME = str(ACCESS["o365"]["username"])
+        PASSWORD = str(ACCESS["o365"]["password"])
+        MAIL_SERVER = str(ACCESS["o365"]["mail_server"])
+        # toaddr = ["abhijit.dhar@whitehatvirtual.com", "val.king@whitehatvirtual.com", \
+        #           "dgalma01@vvrmc.org", "maricela.sandoval@amistadmp.org", "melanie.torres@vvrmc.org", \
+        #           "Albert.Lattimer@vvrmc.org", "letty.ortiz@vvrmc.org",
+        #           "georgios.fotiadis@whitehatvirtual.com"]
+        # toaddr = ["georgios.fotiadis@whitehatvirtual.com", "Maricela.Sandoval@vvrmc.org"]
+        toaddr = ["georgios.fotiadis@whitehatvirtual.com"]
+        module_general_funcs.send_mail(USERNAME, PASSWORD, MAIL_SERVER, toaddr, extensionStats.email_subject,
+                                       extensionStats.html_content, [extensionStats.full_filename], False, False)
 
 #################
 ## Hunt Pilots ##
@@ -141,41 +166,12 @@ for department, extension in HUNTPILOTS.items():
     print(huntpilotStats.html_content)
     print(huntpilotStats)
 
-
-
-###############
-# Send Emails #
-###############
-if SEND_EMAILS:
-    for department, extension in DEPARTMENTS.items():
+    if SEND_EMAILS:
         USERNAME = str(ACCESS["o365"]["username"])
         PASSWORD = str(ACCESS["o365"]["password"])
         MAIL_SERVER = str(ACCESS["o365"]["mail_server"])
-        # toaddr = ["abhijit.dhar@whitehatvirtual.com", "val.king@whitehatvirtual.com", \
-        #           "dgalma01@vvrmc.org", "maricela.sandoval@amistadmp.org", "melanie.torres@vvrmc.org", \
-        #           "Albert.Lattimer@vvrmc.org", "letty.ortiz@vvrmc.org",
-        #           "georgios.fotiadis@whitehatvirtual.com"]
-        toaddr = ["georgios.fotiadis@whitehatvirtual.com"]
-        # toaddr = ["georgios.fotiadis@whitehatvirtual.com", "Maricela.Sandoval@vvrmc.org"]
-        module_funcs.send_mail(USERNAME, PASSWORD, MAIL_SERVER, toaddr, callTreeStats.email_subject, callTreeStats.html_content, [callTreeStats.full_filename], False, False)
-
-    for department, extension in EXTENSIONS.items():
-        USERNAME = str(ACCESS["o365"]["username"])
-        PASSWORD = str(ACCESS["o365"]["password"])
-        MAIL_SERVER = str(ACCESS["o365"]["mail_server"])
-        # toaddr = ["abhijit.dhar@whitehatvirtual.com", "val.king@whitehatvirtual.com", \
-        #           "dgalma01@vvrmc.org", "maricela.sandoval@amistadmp.org", "melanie.torres@vvrmc.org", \
-        #           "Albert.Lattimer@vvrmc.org", "letty.ortiz@vvrmc.org",
-        #           "georgios.fotiadis@whitehatvirtual.com"]
-        # toaddr = ["georgios.fotiadis@whitehatvirtual.com", "Maricela.Sandoval@vvrmc.org"]
-        toaddr = ["georgios.fotiadis@whitehatvirtual.com"]
-        module_funcs.send_mail(USERNAME, PASSWORD, MAIL_SERVER, toaddr, extensionStats.email_subject, extensionStats.html_content, [extensionStats.full_filename], False, False)
-
-    for department, extension in HUNTPILOTS.items():
-        USERNAME = str(ACCESS["o365"]["username"])
-        PASSWORD = str(ACCESS["o365"]["password"])
-        MAIL_SERVER = str(ACCESS["o365"]["mail_server"])
-        toaddr = ["georgios.fotiadis@whitehatvirtual.com"]
         # toaddr = ["val.king@whitehatvirtual.com", "georgios.fotiadis@whitehatvirtual.com"]
-        module_funcs.send_mail(USERNAME, PASSWORD, MAIL_SERVER, toaddr, huntpilotStats.email_subject, huntpilotStats.html_content, [huntpilotStats.full_filename], False, False)
+        toaddr = ["georgios.fotiadis@whitehatvirtual.com"]
+        module_general_funcs.send_mail(USERNAME, PASSWORD, MAIL_SERVER, toaddr, huntpilotStats.email_subject,
+                                       huntpilotStats.html_content, [huntpilotStats.full_filename], False, False)
 

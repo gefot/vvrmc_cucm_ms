@@ -1,12 +1,12 @@
-
 import sys
+# This is needed so as to run on CLI
+sys.path.append('/home/gfot/vvrmc_cucm_ms')
+
 import json
 import datetime
 
 from modules import module_cucm_funcs
 
-# This is needed so as to run on CLI
-sys.path.append('/home/gfot/vvrmc_cucm_ms')
 
 ########################################################################################################################
 # Constant Variables
